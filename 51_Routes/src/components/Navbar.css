@@ -1,0 +1,65 @@
+/* Sets the page background color like in the image */
+body {
+  background-color: #d7f0e8;
+  font-family: sans-serif;
+  padding-top: 2rem;
+}
+
+/* A wrapper to help center the navbar on the page */
+.navbar-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+/* The main navbar styling for the pill shape and layout */
+.navbar {
+  display: flex;
+  justify-content: space-evenly; /* Pushes links to the left and button to the right */
+  align-items: center;
+  background-color: #f0f2ff; /* Light lavender-white background */
+  padding: 12px 30px;
+  border-radius: 9999px; /* This makes the corners fully rounded */
+  width: 90%;
+  max-width: 900px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+  font-size: 20px;
+  font-weight: 600;
+  border: 1px solid #b9a0a0;
+}
+
+/* A container for your navigation links */
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 45px; /* Space between each link */
+}
+
+/* Styling for each navigation link */
+.nav-link {
+  text-decoration: none;
+  color: #4a5568; /* A muted, dark gray color for the text */
+  transition: color 0.3s;
+}
+
+.nav-link:hover {
+  color: #1a202c; /* Darker color on hover */
+}
+
+.nav-link.active {
+  color: #f97316; /* This is a nice shade of orange */
+  font-weight: bold;
+}
+
+button {
+  background-color: #f97316; /* Bright orange background */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 9999px; /* Fully rounded button */
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: background-color 0.3s, transform 0.2s;
+}
