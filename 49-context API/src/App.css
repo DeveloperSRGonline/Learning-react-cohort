@@ -1,0 +1,143 @@
+body {
+  background-color: #1a1a1a;
+  color: #f0f0f0;
+  font-family: sans-serif;
+  padding: 40px;
+}
+
+h1 {
+  font-weight: 400;
+  text-transform: uppercase;
+  background: linear-gradient(to bottom right, white, darkslategray);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+h3 {
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+h1 {
+  font-size: 3.5rem;
+  margin-bottom: 25px;
+}
+
+.app-container {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 40px;
+  color: white;
+  justify-content: space-between;
+  height: calc(100vh - 80px);
+}
+.app-container::selection {
+  color: whitesmoke;
+}
+
+.create-task-section,
+.all-tasks-section {
+  margin-bottom: 60px;
+  width: 50%;
+}
+.all-tasks-section {
+  height: 100%;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+} 
+
+.task-form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 15px;
+}
+
+.task-form input[type="text"] {
+  background-color: transparent;
+  border: 2px solid rgb(65, 108, 108);
+  border-radius: 7px;
+  padding: 15px 20px;
+  color: #f0f0f0;
+  font-size: 1rem;
+  width: 100%;
+  outline: 2px solid transparent;
+  outline-offset: 3px;
+}
+.imp {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: yellow;
+}
+
+.task-form button {
+  background: linear-gradient(to bottom right, black, darkslategray);
+  color: white;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 2rem;
+  border-radius: 10px;
+  text-transform: lowercase;
+  margin-top: 20px;
+}
+
+.tasks-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+input[type="checkbox"] {
+  width: 25px; /* Adjust the size as needed */
+  height: 25px; /* Adjust the size as needed */
+}
+
+.task-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(to bottom right, black, darkslategray);
+  border: 1px solid rgb(65, 108, 108); /* Green border */
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.task-content h3 {
+  margin: 0 0 5px 0;
+  font-size: 1.8rem;
+  text-transform: capitalize;
+}
+
+.task-content p {
+  margin: 0;
+  color: #9b9b9b;
+  margin: 0.5rem 0;
+}
+.task-content span {
+  font-size: 15px;
+  padding: 0.2rem 0.5rem;
+  border-radius: 10px;
+}
+.tomato {
+  color: #fffb00;
+  border: 1px solid #fffb00;
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  color: rgb(255, 147, 147);
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+}
+.error{
+  color: rgb(255, 181, 181);
+}
