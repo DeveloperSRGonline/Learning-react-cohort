@@ -1,0 +1,78 @@
+/* Import a modern font from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+.register-container {
+  width: 350px;
+  margin: 50px auto;
+  padding: 30px;
+  border-radius: 15px;
+  background: #1a1a2e; /* Dark blue background */
+  color: #e0e0e0; /* Light grey text */
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  font-family: 'Poppins', sans-serif;
+  border: 1px solid #3a3a5e;
+}
+
+.register-container h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 300;
+  font-size: 0.9em;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  box-sizing: border-box;
+  border: 1px solid #3a3a5e;
+  border-radius: 8px;
+  background: #161625;
+  color: #e0e0e0;
+  font-size: 1em;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+/* Interaction: Highlight input on focus */
+.form-group input:focus {
+  outline: none;
+  border-color: #7b4dff;
+  box-shadow: 0 0 8px rgba(123, 77, 255, 0.5);
+}
+
+.register-btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.1em;
+  font-weight: 600;
+  color: white;
+  /* Modern Gradient */
+  background-image: linear-gradient(to right, #7b4dff, #b429ff);
+  background-size: 200% auto;
+  transition: background-position 0.5s, transform 0.2s;
+}
+
+/* Interaction: Button hover effect */
+.register-btn:hover {
+  background-position: right center; /* change the direction of the change here */
+  transform: scale(1.02);
+}
+
+/* Interaction: Button active effect */
+.register-btn:active {
+    transform: scale(0.98);
+}
