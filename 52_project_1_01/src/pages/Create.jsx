@@ -1,10 +1,11 @@
 import { nanoid } from "nanoid";
 import React, { useContext } from "react";
 import { useForm } from "react-hook-form";
-import { RecipeContextProvider } from "../context/RecipeContext";
+import { recipeContextProvider } from "../context/RecipeContext";
 
 const Create = () => {
-  const {data,setdata } = useContext(RecipeContextProvider)
+  const {data,setdata} = useContext(recipeContextProvider)
+
   const {
     register,
     handleSubmit,
@@ -12,60 +13,79 @@ const Create = () => {
     formState: { errors },
   } = useForm();
 
-  const submitHandler = (recipe) => {
-    recipe.id = nanoid()
-    
-    // const copydata = [...data]
-    // copydata.push(recipe)
-    // setdata(copydata)
-
-    setdata([...data,recipe])
+  const submitHandler = (formdata) => {
+    formdata.id = nanoid()
+    setdata([...data,formdata])
     reset();
-  }
+  };
+
+  const inputClass =
+    "border-b text-orange-100 mb-3 p-2 w-full block outline-0 border-orange-300 placeholder-orange-100";
+
   return (
-    <form onSubmit={handleSubmit(submitHandler)}>
+    <form onSubmit={handleSubmit(submitHandler)} className="min-w-full">
+      {/* Title */}
       <input
-        className="block border-b outline-0 p-2"
-        {...register("title")}
+        className={inputClass}
+        {...register("title", { required: "Title is required" })}
         type="text"
-        placeholder="Recipt title here"
+        placeholder="Recipe Title"
       />
-      <small className="text-red-500">This is how error will show</small>
+
+      {/* Image Link */}
       <input
-        className="block border-b outline-0 p-2"
-        {...register("image")}
+        className={inputClass}
+        {...register("image", { required: "Image link is required" })}
         type="url"
-        placeholder="Enter image url here..."
+        placeholder="Recipe Image URL"
       />
+
+      {/* Description */}
       <textarea
-        className="block border-b outline-0 p-2"
-        {...register("description")}
-        type="url"
-        placeholder="Description goes here..."
+        className={inputClass}
+        {...register("description", { required: "Description is required" })}
+        placeholder="Recipe Description"
       />
+
+      {/* Ingredients */}
       <textarea
-        className="block border-b outline-0 p-2"
-        {...register("ingredients")}
-        type="url"
-        placeholder="Ingridients seperated by comma..."
+        className={inputClass}
+        {...register("ingredients", { required: "Ingredients is required" })}
+        placeholder="Recipe ingredients (comma separated)"
       />
+
+      {/* Instructions */}
       <textarea
-        className="block border-b outline-0 p-2"
-        {...register("instructions")}
-        type="url"
-        rows={5}
-        placeholder="instructions seperated by comma..."
+        className={inputClass}
+        {...register("instructions", { required: "Instructions is required" })}
+        placeholder="Recipe Instructions (step-by-step or comma separated)"
       />
+
       <select
-        className="block border-b outline-0 p-2"
-        {...register("category")}
+        className="border-b mb-3 p-2 w-full block outline-0 border-orange-300 placeholder-orange-300 appearance-none bg-white dark:bg-gray-800 dark:text-orange-100"
+        {...register("category", { required: "Category is required" })}
+        defaultValue=""
       >
-        <option value="cat 1">Category 1</option>
-        <option value="cat 2">Category 2</option>
-        <option value="cat 3">Category 3</option>
+        <option value="" disabled className="text-gray-400 dark:text-gray-400">
+          Select a Category
+        </option>
+        <option value="main_dish" className="dark:bg-gray-800 dark:text-white">
+          Main Dish
+        </option>
+        <option value="dessert" className="dark:bg-gray-800 dark:text-white">
+          Dessert
+        </option>
+        <option value="appetizer" className="dark:bg-gray-800 dark:text-white">
+          Appetizer
+        </option>
+        <option value="breakfast" className="dark:bg-gray-800 dark:text-white">
+          Breakfast
+        </option>
       </select>
-      
-      <button className="block mt-5">Create Recipe</button>
+
+      <button className="mt-4 p-2 w-full bg-orange-500 text-white font-semibold rounded-md hover:bg-orange-600 transition duration-150">
+        Create Recipe
+      </button>
     </form>
   );
 };

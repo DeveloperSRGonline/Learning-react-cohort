@@ -1,13 +1,9 @@
-import { useContext } from 'react'
-import { RecipeContextProvider } from '../context/RecipeContext'
+import React, { useContext } from 'react'
+import { recipeContextProvider } from '../context/RecipeContext'
 
 const Recipes = () => {
-  const {data} = useContext(RecipeContextProvider)
-  const renderRecipes = data.map((recipe,index) => {
-    return <div key={index}>
-      <h1>{recipe.title}</h1>
-    </div>
-  })
+  const {data,setdata} = useContext(recipeContextProvider)
+  const renderRecipes = data.map((recipe)=> <div key={recipe.id}>{recipe.title}</div>)
   return (
     <div>{renderRecipes}</div>
   )
