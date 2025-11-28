@@ -6,9 +6,15 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
 const Create = () => {
+  // getting navigate frmo the useNavigate
   const navigate = useNavigate()
-  const {data,setdata} = useContext(recipeContextProvider)
 
+
+  // getting data and setdata from the context
+  const { data, setdata } = useContext(recipeContextProvider)
+
+
+  // destructing useForm hook to get register, handleSubmit, reset, formState and more needed
   const {
     register,
     handleSubmit,
@@ -16,17 +22,27 @@ const Create = () => {
     formState: { errors },
   } = useForm();
 
+
+  // a fat arrow function to handle the submit
   const submitHandler = (formdata) => {
+    // setting each data's id
     formdata.id = nanoid()
-    setdata([...data,formdata])
+    // spreeding old data and new form data in the data using setData func
+    setdata([...data, formdata])
+    // sending success message
     toast.success("Recipe Created Successfully!")
+    // after creation of recipe navigate to the /recipes page
     navigate('/recipes')
+    // reset the form inputs 
     reset();
   };
 
+
+  // input class to avoid repeatness
   const inputClass =
     "border-b text-orange-100 mb-3 p-2 w-full block outline-0 border-orange-300 placeholder-orange-100";
 
+    
   return (
     <form onSubmit={handleSubmit(submitHandler)} className="min-w-full">
       {/* Title */}
@@ -67,7 +83,7 @@ const Create = () => {
       />
 
       <select
-        className="border-b mb-3 p-2 w-full block outline-0 border-orange-300 placeholder-orange-300 appearance-none bg-white dark:bg-gray-800 dark:text-orange-100"
+        className={inputClass}
         {...register("category", { required: "Category is required" })}
         defaultValue=""
       >

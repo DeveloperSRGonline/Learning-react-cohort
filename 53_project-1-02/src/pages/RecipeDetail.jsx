@@ -1,241 +1,177 @@
-import React, { useContext, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { recipeContextProvider } from "../context/RecipeContext";
-import { useForm, useFieldArray } from "react-hook-form";
-import { toast } from "react-toastify";
-
-const splitToList = (str, separator = ",") => {
-  if (!str) return [];
-  return str.split(separator).map((item) => ({ value: item.trim() }));
-};
+import React, { useContext, useEffect } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
+import { recipeContextProvider } from '../context/RecipeContext'
+import { toast } from 'react-toastify';
+import { useForm } from 'react-hook-form';
 
 const RecipeDetail = () => {
-  const { data, setdata } = useContext(recipeContextProvider);
+  // getting id from the params using useParams hook
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const selectedRecipe = data.find((recipe) => recipe.id == id);
+  // getting data from the context
+  const { data, setdata } = useContext(recipeContextProvider);
+
+  // finding the target recipe
+  const targetRecipe = data.find(recipe => recipe.id === id)
 
   const {
     register,
     handleSubmit,
-    control,
-    watch,
     reset,
-    formState: { errors, isDirty },
+    formState: { errors },
   } = useForm({
     defaultValues: {
-      title: selectedRecipe?.title,
-      image: selectedRecipe?.image,
-      description: selectedRecipe?.description,
-      category: selectedRecipe?.category,
-      ingredients: splitToList(selectedRecipe?.ingredients, ","),
-      instructions: splitToList(selectedRecipe?.instructions, ";"),
+      title: targetRecipe?.title || '',
+      image: targetRecipe?.image || '',
+      description: targetRecipe?.description || '',
+      ingredients: targetRecipe?.ingredients || '',
+      instructions: targetRecipe?.instructions || '',
+      category: targetRecipe?.category || '',
     },
   });
 
-  const {
-    fields: ingredientFields,
-    append: appendIngredient,
-    remove: removeIngredient,
-  } = useFieldArray({
-    control,
-    name: "ingredients",
-  });
 
-  const {
-    fields: instructionFields,
-    append: appendInstruction,
-    remove: removeInstruction,
-  } = useFieldArray({
-    control,
-    name: "instructions",
-  });
+  const submitHandler = (formdata) => {
+    // update the existing recipe
+    const updatedRecipe = { ...targetRecipe, ...formdata };
 
-  const watchedValues = watch();
-
-  useEffect(() => {
-    if (!isDirty) return;
-
-    const timer = setTimeout(() => {
-      const formData = watchedValues;
-      const ingredientsString = formData.ingredients
-        .map((item) => item.value.trim())
-        .join(",");
-      const instructionsString = formData.instructions
-        .map((item) => item.value.trim())
-        .join(";");
-
-      const updatedRecipe = {
-        ...selectedRecipe,
-        ...formData,
-        ingredients: ingredientsString,
-        instructions: instructionsString,
-      };
-
-      const updatedData = data.map((recipe) =>
-        recipe.id == id ? updatedRecipe : recipe
-      );
-
-      setdata(updatedData);
-      toast.success("Changes auto-saved!");
-      reset(formData);
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, [
-    JSON.stringify(watchedValues),
-    isDirty,
-    setdata,
-    id,
-    selectedRecipe,
-    data,
-    reset,
-  ]);
-
-  const submitHandler = (formData) => {
-    const ingredientsString = formData.ingredients
-      .map((item) => item.value.trim())
-      .join(",");
-    const instructionsString = formData.instructions
-      .map((item) => item.value.trim())
-      .join(";");
-
-    const updatedRecipe = {
-      ...selectedRecipe,
-      ...formData,
-      ingredients: ingredientsString,
-      instructions: instructionsString,
-    };
-
-    const updatedData = data.map((recipe) =>
-      recipe.id == id ? updatedRecipe : recipe
-    );
+    // update the data array
+    const updatedData = data.map(r => r.id === id ? updatedRecipe : r);
 
     setdata(updatedData);
-    toast.success("Recipe Updated Successfully!");
-    navigate("/recipes");
+
+    // sending success message
+    toast.success("Recipe Updated Successfully!")
+    // reset the form inputs 
+    reset();
   };
 
-  if (!selectedRecipe) {
-    return "Loading...";
-  }
+  const deleteHandler = (id) => {
+    // filter out the target recipe
+    const updatedData = data.filter(r => r.id !== id);
 
-  return (
-    <form onSubmit={handleSubmit(submitHandler)}>
-      {/* --- Title, Image, Description (Same as before) --- */}
-      <input
-        className="font-medium text-center mb-4 text-5xl w-full bg-transparent text-gray-300 focus:outline-0 outline-none"
-        {...register("title", { required: "Title is required" })}
-        type="text"
-      />
-      {errors.title && <p className="text-red-500">{errors.title.message}</p>}
+    // update the data array in context
+    setdata(updatedData);
 
-      <img
-        className="w-[70vw] h-[20vw] object-cover rounded-xl my-5"
-        src={selectedRecipe.image}
-        alt={selectedRecipe.title}
-      />
-      <input
-        className="text-lg w-full bg-gray-800 text-gray-300 focus:outline-0 outline-none p-2 rounded mb-4"
-        {...register("image", { required: "Image URL is required" })}
-        type="text"
-      />
-      {errors.image && <p className="text-red-500">{errors.image.message}</p>}
+    // sending success message
+    toast.success("Recipe Deleted Successfully!");
 
-      <textarea
-        className="text-3xl text-gray-400 w-full bg-transparent focus:outline-0 outline-none"
-        rows="3"
-        {...register("description", { required: "Description is required" })}
-      />
-      {errors.description && (
-        <p className="text-red-500">{errors.description.message}</p>
-      )}
+    // navigate back to the home page or recipe list
+    navigate('/recipes');
+  };
 
-      {/* --- Ingredients List --- */}
-      <h2 className="text-5xl my-4 font-medium text-amber-100">Ingredients:</h2>
-      <div className="flex flex-col gap-2">
-        {ingredientFields.map((field, index) => (
-          <div key={field.id} className="flex gap-2 items-center">
-            <input
-              className="text-xl w-full bg-gray-800 text-gray-300 focus:outline-0 outline-none p-2 rounded"
-              {...register(`ingredients.${index}.value`)}
-            />
-            <button
-              type="button"
-              className="px-4 py-2 text-white font-medium bg-red-600 text-xs rounded"
-              onClick={() => removeIngredient(index)}
-            >
-              Remove
-            </button>
-          </div>
-        ))}
+
+  const listIngredients = targetRecipe?.ingredients?.split(',').map((d, i) => <li className='list-disc ml-3' key={i}>{d}</li>)
+
+
+  const listInstructions = targetRecipe?.instructions?.split(';').map((d, i) => <li className='list-decimal ml-3' key={i}>{d}</li>)
+
+
+
+  return targetRecipe ? <div className='flex w-full justify-between gap-10 items-start'>
+    <div className='left w-[50%] p-5 bg-gray-800 rounded-lg shadow-lg'>
+      <h1 className='text-4xl font-bold mb-4 text-orange-500'>{targetRecipe.title}</h1>
+      <img className='w-full h-64 object-cover rounded-md mb-4' src={targetRecipe.image} alt={targetRecipe.title} />
+      <p className='text-gray-300 mb-4'>{targetRecipe.description}</p>
+
+      <h3 className='text-xl font-semibold mb-2 text-orange-400'>Ingredients</h3>
+      <ul className='list-disc pl-5 mb-4 text-gray-300'>
+        {listIngredients}
+      </ul>
+
+      <h3 className='text-xl font-semibold mb-2 text-orange-400'>Instructions</h3>
+      <ol className='list-decimal pl-5 mb-4 text-gray-300'>
+        {listInstructions}
+      </ol>
+
+      <p className='text-sm text-gray-400 uppercase tracking-wider'>Category: {targetRecipe.category}</p>
+    </div>
+
+    <div className='right w-[50%] p-5 bg-gray-800 rounded-lg shadow-lg'>
+      <h2 className='text-2xl font-bold mb-6 text-orange-500'>Edit Recipe</h2>
+      <form onSubmit={handleSubmit(submitHandler)} className="flex flex-col gap-4">
+        {/* Title */}
+        <div className="flex flex-col gap-1">
+          <label className="text-gray-400 text-sm">Title</label>
+          <input
+            className="p-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-orange-500 outline-none"
+            {...register("title", { required: "Title is required" })}
+            type="text"
+          />
+        </div>
+
+        {/* Image Link */}
+        <div className="flex flex-col gap-1">
+          <label className="text-gray-400 text-sm">Image URL</label>
+          <input
+            className="p-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-orange-500 outline-none"
+            {...register("image", { required: "Image link is required" })}
+            type="url"
+            placeholder="Recipe Image URL"
+          />
+        </div>
+
+        {/* Description */}
+        <div className="flex flex-col gap-1">
+          <label className="text-gray-400 text-sm">Description</label>
+          <textarea
+            className="p-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-orange-500 outline-none h-24 resize-none"
+            {...register("description", { required: "Description is required" })}
+            placeholder="Recipe Description"
+          />
+        </div>
+
+        {/* Ingredients */}
+        <div className="flex flex-col gap-1">
+          <label className="text-gray-400 text-sm">Ingredients (comma separated)</label>
+          <textarea
+            className="p-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-orange-500 outline-none h-24 resize-none"
+            {...register("ingredients", { required: "Ingredients is required" })}
+            placeholder="Recipe ingredients"
+          />
+        </div>
+
+        {/* Instructions */}
+        <div className="flex flex-col gap-1">
+          <label className="text-gray-400 text-sm">Instructions (step-by-step or comma separated)</label>
+          <textarea
+            className="p-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-orange-500 outline-none h-24 resize-none"
+            {...register("instructions", { required: "Instructions is required" })}
+            placeholder="Recipe Instructions"
+          />
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <label className="text-gray-400 text-sm">Category</label>
+          <select
+            className="p-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-orange-500 outline-none"
+            {...register("category", { required: "Category is required" })}
+            defaultValue=""
+          >
+            <option value="" disabled className="text-gray-400">
+              Select a Category
+            </option>
+            <option value="main_dish">Main Dish</option>
+            <option value="dessert">Dessert</option>
+            <option value="appetizer">Appetizer</option>
+            <option value="breakfast">Breakfast</option>
+          </select>
+        </div>
+
+        <button className="mt-4 p-3 w-full bg-orange-500 text-white font-bold rounded-md hover:bg-orange-600 transition duration-150 shadow-md">
+          Update Recipe
+        </button>
         <button
           type="button"
-          className="px-4 py-2 text-white font-medium bg-green-700 rounded mt-2 self-start"
-          onClick={() => appendIngredient({ value: "" })}
-        >
-          Add Ingredient
-        </button>
-      </div>
-
-      {/* --- Instructions List --- */}
-      <h2 className="text-5xl my-4 font-medium text-amber-100">
-        Instructions:
-      </h2>
-      <div className="flex flex-col gap-2">
-        {instructionFields.map((field, index) => (
-          <div key={field.id} className="flex gap-2 items-center">
-            <input
-              className="text-xl w-full bg-gray-800 text-gray-300 focus:outline-0 outline-none p-2 rounded"
-              {...register(`instructions.${index}.value`)}
-            />
-            <button
-              type="button"
-              className="px-4 py-2 text-white font-medium text-xs bg-red-600 rounded"
-              onClick={() => removeInstruction(index)}
-            >
-              Remove
-            </button>
-          </div>
-        ))}
-        <button
-          type="button"
-          className="px-4 py-2 text-white font-medium bg-green-700 rounded mt-2 self-start"
-          onClick={() => appendInstruction({ value: "" })}
-        >
-          Add Instruction
-        </button>
-      </div>
-
-      {/* --- Category (Same as before) --- */}
-      <h2 className="text-5xl my-4 font-medium">Category:</h2>
-      <input
-        className="font-normal text-amber-400 text-3xl w-full bg-transparent focus:outline-0 outline-none"
-        {...register("category", { required: "Category is required" })}
-        type="text"
-      />
-      {errors.category && (
-        <p className="text-red-500">{errors.category.message}</p>
-      )}
-
-      {/* --- Buttons (Same as before) --- */}
-      <div className="flex gap-4 my-8">
-        <button
-          type="submit"
-          className="px-10 py-1.5 text-white font-medium bg-green-700 rounded-full "
-        >
-          Save Changes
-        </button>
-        <button
-          type="button"
-          className="px-10 py-1.5 text-white font-medium bg-red-700 rounded-full "
+          className="mt-2 p-3 w-full bg-red-600 text-white font-bold rounded-md hover:bg-red-700 transition duration-150 shadow-md"
+          onClick={() => deleteHandler(targetRecipe.id)}
         >
           Delete
         </button>
-      </div>
-    </form>
-  );
-};
+      </form>
+    </div>
+  </div> : <div className="text-white text-2xl text-center mt-10">Loading...</div>
+}
 
 export default RecipeDetail;
