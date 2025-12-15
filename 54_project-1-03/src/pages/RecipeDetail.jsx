@@ -1,8 +1,10 @@
-import React, { useContext, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { recipeContextProvider } from '../context/RecipeContext'
-import { toast } from 'react-toastify';
-import { useForm } from 'react-hook-form';
+import React, { useContext } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { recipeContextProvider } from "../context/recipeContext";
+import { useForm } from "react-hook-form";
+import { useEffect } from "react";
+import { toast } from "react-toastify";
+import { Heart } from "lucide-react";
 
 const RecipeDetail = () => {
   // getting id from the params using useParams hook
@@ -14,6 +16,16 @@ const RecipeDetail = () => {
 
   // finding the target recipe
   const targetRecipe = data.find(recipe => recipe.id === id)
+
+  const [isFavorite, setIsFavorite] = React.useState(false);
+
+  useEffect(() => {
+    if (targetRecipe) {
+      const favs = JSON.parse(localStorage.getItem('fav')) || [];
+      const exists = favs.some(r => r.id === targetRecipe.id);
+      setIsFavorite(exists);
+    }
+  }, [targetRecipe]);
 
   const {
     register,
@@ -31,6 +43,19 @@ const RecipeDetail = () => {
     },
   });
 
+  useEffect(() => {
+    if (targetRecipe) {
+      reset({
+        title: targetRecipe.title,
+        image: targetRecipe.image,
+        description: targetRecipe.description,
+        ingredients: targetRecipe.ingredients,
+        instructions: targetRecipe.instructions,
+        category: targetRecipe.category,
+      });
+    }
+  }, [targetRecipe, reset]);
+
 
   const submitHandler = (formdata) => {
     // update the existing recipe
@@ -38,8 +63,10 @@ const RecipeDetail = () => {
 
     // update the data array
     const updatedData = data.map(r => r.id === id ? updatedRecipe : r);
+    localStorage.setItem('recipes', JSON.stringify(updatedData))
 
     setdata(updatedData);
+
 
     // sending success message
     toast.success("Recipe Updated Successfully!")
@@ -54,6 +81,8 @@ const RecipeDetail = () => {
     // update the data array in context
     setdata(updatedData);
 
+    localStorage.setItem('recipes', JSON.stringify(updatedData))
+
     // sending success message
     toast.success("Recipe Deleted Successfully!");
 
@@ -61,12 +90,29 @@ const RecipeDetail = () => {
     navigate('/recipes');
   };
 
+  const likeHandler = () => {
+    const favs = JSON.parse(localStorage.getItem('fav')) || [];
+    const updatedFavs = [...favs, targetRecipe];
+    localStorage.setItem('fav', JSON.stringify(updatedFavs));
+    setIsFavorite(true);
+    toast.success("Recipe added to favorites!");
+    navigate('/favourite');
+  }
+
+  const unLikeHandler = () => {
+    const favs = JSON.parse(localStorage.getItem('fav')) || [];
+    const updatedFavs = favs.filter(r => r.id !== targetRecipe.id);
+    console.log(updatedFavs)
+    localStorage.setItem('fav', JSON.stringify(updatedFavs));
+    setIsFavorite(false);
+    toast.success("Recipe removed from favorites!");
+  }
+
 
   const listIngredients = targetRecipe?.ingredients?.split(',').map((d, i) => <li className='list-disc ml-3' key={i}>{d}</li>)
 
 
   const listInstructions = targetRecipe?.instructions?.split(';').map((d, i) => <li className='list-decimal ml-3' key={i}>{d}</li>)
-
 
 
   return targetRecipe ? <div className='flex w-full justify-between gap-10 items-start'>
@@ -98,6 +144,7 @@ const RecipeDetail = () => {
             className="p-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-orange-500 outline-none"
             {...register("title", { required: "Title is required" })}
             type="text"
+            defaultValue={targetRecipe.title}
           />
         </div>
 
@@ -109,6 +156,7 @@ const RecipeDetail = () => {
             {...register("image", { required: "Image link is required" })}
             type="url"
             placeholder="Recipe Image URL"
+            defaultValue={targetRecipe.image}
           />
         </div>
 
@@ -119,6 +167,7 @@ const RecipeDetail = () => {
             className="p-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-orange-500 outline-none h-24 resize-none"
             {...register("description", { required: "Description is required" })}
             placeholder="Recipe Description"
+            defaultValue={targetRecipe.description}
           />
         </div>
 
@@ -129,6 +178,7 @@ const RecipeDetail = () => {
             className="p-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-orange-500 outline-none h-24 resize-none"
             {...register("ingredients", { required: "Ingredients is required" })}
             placeholder="Recipe ingredients"
+            defaultValue={targetRecipe.ingredients}
           />
         </div>
 
@@ -139,6 +189,7 @@ const RecipeDetail = () => {
             className="p-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-orange-500 outline-none h-24 resize-none"
             {...register("instructions", { required: "Instructions is required" })}
             placeholder="Recipe Instructions"
+            defaultValue={targetRecipe.instructions}
           />
         </div>
 
@@ -161,16 +212,32 @@ const RecipeDetail = () => {
         </div>
 
         {/* Update and Delete buttons */}
-        <button className="mt-4 p-3 w-full bg-orange-500 text-white font-bold rounded-md hover:bg-orange-600 transition duration-150 shadow-md">
-          Update Recipe
-        </button>
-        <button
-          type="button"
-          className="mt-2 p-3 w-full bg-red-600 text-white font-bold rounded-md hover:bg-red-700 transition duration-150 shadow-md"
-          onClick={() => deleteHandler(targetRecipe.id)}
-        >
-          Delete
-        </button>
+        <div className="flex gap-2 align-center">
+          <button className="p-3 w-full bg-orange-500 text-white font-bold rounded-md hover:bg-orange-600 transition duration-150">
+            Update Recipe
+          </button>
+          <button
+            type="button"
+            className="p-3 w-full bg-red-600 text-white font-bold rounded-md hover:bg-red-700 transition duration-150"
+            onClick={() => deleteHandler(targetRecipe.id)}
+          >
+            Delete
+          </button>
+        </div>
+        <div className="flex gap-2 align-center">
+          <button
+            type="button"
+            className="mt-2 p-3 w-full bg-red-600 text-white font-bold rounded-md hover:bg-red-700 transition duration-150"
+            onClick={() => navigate('/recipes')}
+          >
+            Back to Recipe List
+          </button>
+          <div className="flex gap-2 align-center">
+            {isFavorite ? <Heart onClick={unLikeHandler} className='text-red-500 fill-red-500 cursor-pointer' /> : <Heart onClick={likeHandler} className='cursor-pointer hover:text-red-500 transition-colors' />}
+
+          </div>
+        </div>
+
       </form>
     </div>
   </div> : <div className="text-white text-2xl text-center mt-10">Loading...</div>

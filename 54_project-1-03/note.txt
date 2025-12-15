@@ -1,0 +1,12 @@
+mount
+unmount
+update
+useEffect helps in this three things in react.
+
+update - means change in state/view
+old value deletion and new value creation --> re-render
+
+
+favorite feature
+localstorage 
+and some small twiks
