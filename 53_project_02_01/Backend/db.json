@@ -1,0 +1,50 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "username": "john_doe",
+      "email": "john_doe@gmail.com",
+      "password": "123456"
+    },
+    {
+      "id": "2",
+      "username": "jane_doe",
+      "email": "jane_doe@gmail.com",
+      "password": "123456"
+    },
+    {
+      "id": "5Sdg7INx2Oc_CUxckxP_X",
+      "username": "shivam.g",
+      "email": "a@a.com",
+      "password": "123456",
+      "isAdmin": true
+    }
+  ],
+  "products": [
+    {
+      "id": "adfjlkdjf",
+      "title": "product 1",
+      "description": "product 1 description",
+      "category": "product 1 category",
+      "price": 100,
+      "image": "https://fakestoreapi.com/img/81fPKIYFtL.jpg"
+    },
+    {
+      "id": "adflkjdflk",
+      "title": "product 2",
+      "description": "product 2 description",
+      "category": "product 2 category",
+      "price": 200,
+      "image": "https://fakestoreapi.com/img/81fPKIYFtL.jpg"
+    },
+    {
+      "id": "adflkjdflkf",
+      "title": "product 3",
+      "description": "product 3 description",
+      "category": "product 3 category",
+      "price": 300,
+      "image": "https://fakestoreapi.com/img/81fPKIYFtL.jpg"
+    }
+  ],
+  "cart": []
+}
