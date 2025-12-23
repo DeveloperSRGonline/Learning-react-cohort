@@ -9,14 +9,15 @@ import PageNotFound from '../pages/PageNotFound'
 import CreateProduct from '../pages/admin/CreateProduct'
 import UpdateProduct from '../pages/admin/UpdateProduct'
 import AuthWrapper from '../components/AuthWrapper'
+import PublicRoute from '../components/PublicRoute'
 import AdminDashboard from '../pages/admin/AdminDashboard'
 
 const MainRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<Products />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+      <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+      <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
       <Route path="/cart" element={<Cart />} />
 
       <Route path="/profile" element={<Profile />} />
