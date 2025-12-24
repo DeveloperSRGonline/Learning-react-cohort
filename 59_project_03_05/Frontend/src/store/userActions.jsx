@@ -1,54 +1,64 @@
 import axios from "../api/axiosConfig";
 import { addUsers, removeUser } from "./userSlice";
+import { ENDPOINTS } from "../constants/apiConstants";
 
-export const currentUser = () => async (dispatch, getState) => {
+export const currentUser = () => async (dispatch) => {
     try {
-        const user = JSON.parse(localStorage.getItem('user'))
-        if (user) dispatch(addUsers(user))
-        else console.log('No user found')
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            dispatch(addUsers(JSON.parse(storedUser)));
+        }
     } catch (error) {
-        console.log(error);
+        console.error("Error fetching current user:", error);
     }
-}
+};
 
-export const asyncLogoutUser = () => async (dispatch, getState) => {
+export const asyncLogoutUser = () => async (dispatch) => {
     try {
-        localStorage.removeItem('user')
-        dispatch(removeUser())
-        console.log('User logged out')
+        localStorage.removeItem('user');
+        dispatch(removeUser());
     } catch (error) {
-        console.log(error);
+        console.error("Error during logout:", error);
     }
-}
+};
 
-export const asyncLoginUser = (user) => async (dispatch, getState) => {
+export const asyncLoginUser = (credentials) => async (dispatch) => {
     try {
-        const { data } = await axios.get(`/users?email=${user.email}&password=${user.password}`);
-        console.log(data[0])
-        localStorage.setItem('user', JSON.stringify(data[0]))
-        dispatch(addUsers(data[0]))
+        const { data } = await axios.get(`${ENDPOINTS.USERS}?email=${credentials.email}&password=${credentials.password}`);
+        if (data.length > 0) {
+            const user = data[0];
+            localStorage.setItem('user', JSON.stringify(user));
+            dispatch(addUsers(user));
+            return user;
+        } else {
+            throw new Error("Invalid credentials");
+        }
     } catch (error) {
-        console.log(error);
+        console.error("Login error:", error);
+        throw error;
     }
-}
+};
 
-
-export const asyncRegisterUser = (user) => async (dispatch, getState) => {
+export const asyncRegisterUser = (user) => async (dispatch) => {
     try {
-        // use ko api mein bhejna hai
-        const response = await axios.post("/users", user);
+        const { data } = await axios.post(ENDPOINTS.USERS, user);
+        localStorage.setItem('user', JSON.stringify(data));
+        dispatch(addUsers(data));
+        return data;
     } catch (error) {
-        console.log(error);
+        console.error("Registration error:", error);
+        throw error;
     }
-}
+};
 
-export const asyncUpdateUser = (user) => async (dispatch, getState) => {
+export const asyncUpdateUser = (user) => async (dispatch) => {
     try {
-        const response = await axios.put(`/users/${user.id}`, user);
-        console.log("User updated:", response.data);
-        localStorage.setItem('user', JSON.stringify(response.data));
-        dispatch(addUsers(response.data));
+        const { data } = await axios.put(`${ENDPOINTS.USERS}/${user.id}`, user);
+        localStorage.setItem('user', JSON.stringify(data));
+        dispatch(addUsers(data));
+        return data;
     } catch (error) {
-        console.log("Error updating user:", error);
+        console.error("Error updating user:", error);
+        throw error;
     }
-}
+};

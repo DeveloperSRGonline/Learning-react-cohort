@@ -1,26 +1,19 @@
-import { useEffect } from 'react'
-import { useSelector } from 'react-redux'
-import { useParams } from 'react-router-dom'
-import { useForm } from 'react-hook-form'
-import { asyncUpdateProduct } from '../../store/productActions'
-import { useDispatch } from 'react-redux'
-import { asyncDeleteProduct } from '../../store/productActions'
-import { useNavigate } from 'react-router-dom'
-
+import { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { asyncUpdateProduct, asyncDeleteProduct } from '../../store/productActions';
+import { ROUTES } from '../../constants/apiConstants';
 
 const UpdateProduct = () => {
-  const { id } = useParams()
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
-  const products = useSelector(
-    (state) => state.productsReducer.products
-  )
+  const { id } = useParams();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const user = useSelector(
-    (state) => state.usersReducer?.users
-  )
-  // for finding the 
-  const targetProduct = products && products.find((product) => product.id === id)
+  const products = useSelector((state) => state.productsReducer.products);
+  const user = useSelector((state) => state.usersReducer?.users);
+
+  const targetProduct = products?.find((product) => product.id === id);
 
   const { handleSubmit, register, reset } = useForm({
     defaultValues: {
@@ -30,59 +23,84 @@ const UpdateProduct = () => {
       category: targetProduct?.category,
       image: targetProduct?.image
     }
-  })
+  });
 
-  // for reseting the form
   useEffect(() => {
     if (targetProduct) {
-      reset(targetProduct)
+      reset(targetProduct);
     }
-  }, [targetProduct, reset])
+  }, [targetProduct, reset]);
 
+  const onSubmit = (productData) => {
+    dispatch(asyncUpdateProduct(id, productData));
+    navigate(ROUTES.ADMIN);
+  };
 
-  // for updating on submit
-  const onSubmit = (product) => {
-    dispatch(asyncUpdateProduct(id, product))
-    navigate('/admin')
-  }
+  const deleteHandler = () => {
+    if (window.confirm("Are you sure you want to delete this product?")) {
+      dispatch(asyncDeleteProduct(id));
+      navigate(ROUTES.ADMIN);
+    }
+  };
 
-  // for deleting
-  const deleteHandler = (id) => {
-    dispatch(asyncDeleteProduct(id))
-    navigate('/admin')
+  if (!targetProduct) {
+    return (
+      <div className="update-product-page">
+        <div className="page-overlay"></div>
+        <h2>Product not found</h2>
+        <button onClick={() => navigate(ROUTES.HOME)}>Go Home</button>
+      </div>
+    );
   }
 
   return (
-    <div className="update-product-page" style={targetProduct?.image ? { backgroundImage: `url(${targetProduct.image})` } : {}}>
+    <div className="update-product-page" style={{ backgroundImage: `url(${targetProduct.image})` }}>
       <div className="page-overlay"></div>
-      {user && user.isAdmin ? (
-        <form onSubmit={handleSubmit(onSubmit)} className="update-product-form">
-          <h2>Update Product</h2>
-          <label htmlFor="title">Title:</label>
-          <input type="text" id="title" name="title" {...register('title')} />
-          <label htmlFor="price">Price:</label>
-          <input type="number" id="price" name="price" {...register('price')} />
-          <label htmlFor="description">Description:</label>
-          <textarea id="description" name="description" {...register('description')}></textarea>
-          <label htmlFor="category">Category:</label>
-          <input type="text" id="category" name="category" {...register('category')} />
-          <label htmlFor="image">Image:</label>
-          <input type="url" id="image" name="image" {...register('image')} />
-          <button type="submit">Update Product</button>
-          <button className='delete-product-btn' type="button" onClick={() => deleteHandler(targetProduct.id)}>Delete Product</button>
-        </form>
-      ) : (
-        <div className="update-product-form">
-          <h2>Product Details</h2>
-          <img src={targetProduct?.image} alt={targetProduct?.title} style={{ width: '100%', borderRadius: '10px', marginBottom: '1rem', maxHeight: '250px', objectFit: 'cover' }} />
-          <h3 style={{ color: 'white' }}>{targetProduct?.title}</h3>
-          <p style={{ color: '#ccc', margin: '0.5rem 0' }}>Category: <span style={{ color: '#0099ff' }}>{targetProduct?.category}</span></p>
-          <p style={{ color: 'white', fontWeight: 'bold', fontSize: '1.2rem' }}>${targetProduct?.price}</p>
-          <p style={{ color: '#aeaeae', lineHeight: '1.5' }}>{targetProduct?.description}</p>
-        </div>
-      )}
+
+      <div className="update-product-form-container">
+        {user?.isAdmin ? (
+          <form onSubmit={handleSubmit(onSubmit)} className="update-product-form fade-in">
+            <h2>Update Product</h2>
+            <div className="form-group">
+              <label>Title</label>
+              <input type="text" {...register('title')} />
+            </div>
+            <div className="form-group">
+              <label>Price</label>
+              <input type="number" step="0.01" {...register('price')} />
+            </div>
+            <div className="form-group">
+              <label>Description</label>
+              <textarea {...register('description')}></textarea>
+            </div>
+            <div className="form-group">
+              <label>Category</label>
+              <input type="text" {...register('category')} />
+            </div>
+            <div className="form-group">
+              <label>Image URL</label>
+              <input type="url" {...register('image')} />
+            </div>
+
+            <div className="form-actions">
+              <button type="submit" className="btn-primary">Save Changes</button>
+              <button type="button" className="btn-danger" onClick={deleteHandler}>Delete Product</button>
+            </div>
+          </form>
+        ) : (
+          <div className="update-product-form fade-in">
+            <h2>Product Details</h2>
+            <img src={targetProduct.image} alt={targetProduct.title} style={{ width: '100%', borderRadius: '15px', marginBottom: '1.5rem', maxHeight: '300px', objectFit: 'contain', background: 'white', padding: '10px' }} />
+            <h3 className="product-title-large">{targetProduct.title}</h3>
+            <p className="product-category-tag">{targetProduct.category}</p>
+            <p className="product-price-large">${targetProduct.price}</p>
+            <p className="product-description-full">{targetProduct.description}</p>
+            <button className="btn-secondary" onClick={() => navigate(-1)} style={{ marginTop: '1.5rem', width: '100%' }}>Go Back</button>
+          </div>
+        )}
+      </div>
     </div>
-  )
-}
+  );
+};
 
 export default UpdateProduct;

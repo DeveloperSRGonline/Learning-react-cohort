@@ -1,44 +1,43 @@
 import axios from "../api/axiosConfig";
 import { getAllProducts } from "./productSlice";
 import { toast } from "react-toastify";
+import { ENDPOINTS } from "../constants/apiConstants";
 
-// to get all products
-export const asyncGetAllProducts = () => async (dispatch, getState) => {
+export const asyncGetAllProducts = () => async (dispatch) => {
     try {
-        const { data } = await axios.get('/products')
-        dispatch(getAllProducts(data))
+        const { data } = await axios.get(ENDPOINTS.PRODUCTS);
+        dispatch(getAllProducts(data));
     } catch (error) {
-        toast.error(error.message)
+        toast.error(error.message);
     }
-}
+};
 
-// to add a product
-export const asyncAddProduct = (product) => async (dispatch, getState) => {
+export const asyncAddProduct = (product) => async (dispatch) => {
     try {
-        const { data } = await axios.post('/products', product)
-        dispatch(asyncGetAllProducts())
+        await axios.post(ENDPOINTS.PRODUCTS, product);
+        dispatch(asyncGetAllProducts());
+        toast.success("Product added successfully");
     } catch (error) {
-        toast.error(error.message)
+        toast.error(error.message);
     }
-}
+};
 
-// to update a product
-export const asyncUpdateProduct = (id,product) => async (dispatch, getState) => {
+export const asyncUpdateProduct = (id, product) => async (dispatch) => {
     try {
-        await axios.patch(`/products/${id}`, product)
-        dispatch(asyncGetAllProducts())
+        await axios.patch(`${ENDPOINTS.PRODUCTS}/${id}`, product);
+        dispatch(asyncGetAllProducts());
+        toast.success("Product updated successfully");
     } catch (error) {
-        toast.error(error.message)
+        toast.error(error.message);
     }
-}
+};
 
-// to delete a product
-export const asyncDeleteProduct = (id) => async (dispatch, getState) => {
+export const asyncDeleteProduct = (id) => async (dispatch) => {
     try {
-        await axios.delete(`/products/${id}`)
-        dispatch(asyncGetAllProducts())
+        await axios.delete(`${ENDPOINTS.PRODUCTS}/${id}`);
+        dispatch(asyncGetAllProducts());
+        toast.success("Product deleted successfully");
     } catch (error) {
-        toast.error(error.message)
+        toast.error(error.message);
     }
-}
-
+};

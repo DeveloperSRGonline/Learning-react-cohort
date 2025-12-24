@@ -4,9 +4,13 @@ const getInitialUser = () => {
     try {
         const user = localStorage.getItem('user');
         return user ? JSON.parse(user) : null;
-    } catch (e) {
+    } catch (err) {
+        console.error("Local storage error:", err);
         return null;
     }
+
+
+
 };
 
 const userSlice = createSlice({
